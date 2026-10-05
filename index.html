@@ -1,0 +1,150 @@
+<!--
+    Copyright (C) 2026 Jakub Březa
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://gnu.org>.
+-->
+<!--
+=============================================================================
+PROJEKT / APLIKACE: QuizApp v2 – Dynamika, Časovač a Animace
+FÁZE / LEKCE: Fáze 2 – Dynamické otázky, asynchronní časovač a CSS animace
+=============================================================================
+
+O APLIKACI:
+Druhá fáze interaktivní kvízové webové aplikace rozšiřuje statický prototyp o plnou
+dynamiku. Otázky a možnosti odpovědí se generují a míchají náhodně (Fisher-Yates shuffle),
+reakční doba hráče je limitována odpočítávacím časovačem (setInterval) a každé vyhodnocení
+poskytuje okamžitou vizuální zpětnou vazbu pomocí CSS3 animací (zelený puls / červený třes).
+Aplikace průběžně počítá a zobrazuje celkové skóre i procentuální úspěšnost.
+
+VÝUKOVÉ CÍLE A FUNKCIONALITA FÁZE:
+- Dynamické náhodné generování otázek ze zásobníku a míchání pořadí odpovědí (Math.random, shuffle)
+- Implementace odpočítávacího časovače (setInterval, clearInterval) s automatickým vypršením
+- Vizuální CSS animace zpětné vazby (@keyframes correct-pulse, @keyframes shake) a stavové třídy
+- Časovaný přechod na další otázku po vyhodnocení (setTimeout)
+- Správa herního stavu a výpočet statistik (skóre, celkový počet, procentuální úspěšnost přes Math.round)
+
+KLÍČOVÁ TÉMATA:
+- HTML/CSS: Panel statistik (#stats-bar), ukazatel času (#timer-display), CSS animace (@keyframes), stavové třídy (.correct, .wrong, .disabled)
+- JavaScript: Objekt Math (random, floor, round), časovače (setInterval, clearInterval, setTimeout), manipulace s polem (shuffle), správa stavu
+
+NÁVOD PRO STUDENTY:
+- Pro samostatné procvičování přepněte v hlavičce <head> odkaz na styles-students.css a na konci těla na script-students.js.
+- V souborech *-students.* doplňte kód podle očíslovaných úkolů TODO a nápověd.
+=============================================================================
+-->
+<!DOCTYPE html>
+<html lang="cs">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizApp v2 – Dynamika, Časovač a Animace</title>
+
+    <!-- Google Fonts: Lexend (vysoká čitelnost a přístupnost) a Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Stylopis aplikace (pro studentskou verzi přepněte na href="styles-students.css") -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- <link rel="stylesheet" href="styles-students.css"> -->
+</head>
+
+<body>
+
+    <!-- Záhlaví aplikace -->
+    <header class="app-header">
+        <div class="header-container">
+            <h1 class="app-title">🧠 QuizApp</h1>
+            <span class="badge-phase">Fáze 2: Dynamika & Časovač</span>
+        </div>
+    </header>
+
+    <!-- Hlavní obsah stránky -->
+    <main class="main-content">
+        <!-- Sekce kvízu -->
+        <section id="quiz-container" aria-label="Kvízový panel">
+
+            <!-- Panel statistik a časovače -->
+            <div id="stats-bar" class="stats-bar" role="region" aria-label="Statistiky a časovač">
+                <div class="stat-item">
+                    <span class="stat-label">Skóre:</span>
+                    <strong id="score" class="stat-value">0 / 0</strong>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Úspěšnost:</span>
+                    <strong id="accuracy" class="stat-value">0%</strong>
+                </div>
+                <div id="timer-display" class="timer-display" aria-live="polite">
+                    <span class="timer-icon" aria-hidden="true">⏱️</span>
+                    <span class="timer-text">Čas: <strong id="timer-seconds">10</strong>s</span>
+                </div>
+            </div>
+
+            <!-- Vizuální lišta zbývajícího času -->
+            <div class="timer-bar-container" aria-hidden="true">
+                <div id="timer-progress-bar" class="timer-progress-bar"></div>
+            </div>
+
+            <!-- Karta s otázkou -->
+            <article id="question-card" class="card">
+                <header class="card-header">
+                    <span id="question-badge" class="question-badge">Otázka 1</span>
+                    <h2 id="question-text" class="question-text">Načítám otázku...</h2>
+                </header>
+
+                <!-- Mřížka s tlačítky možností -->
+                <div id="answers-grid" class="answers-grid" role="group" aria-label="Možnosti odpovědí">
+                    <button type="button" class="answer-btn" data-index="0" aria-label="Možnost A">
+                        <span class="option-label">A</span>
+                        <span class="option-text">Odpověď 1</span>
+                    </button>
+                    <button type="button" class="answer-btn" data-index="1" aria-label="Možnost B">
+                        <span class="option-label">B</span>
+                        <span class="option-text">Odpověď 2</span>
+                    </button>
+                    <button type="button" class="answer-btn" data-index="2" aria-label="Možnost C">
+                        <span class="option-label">C</span>
+                        <span class="option-text">Odpověď 3</span>
+                    </button>
+                    <button type="button" class="answer-btn" data-index="3" aria-label="Možnost D">
+                        <span class="option-label">D</span>
+                        <span class="option-text">Odpověď 4</span>
+                    </button>
+                </div>
+            </article>
+
+            <!-- Nápověda / stavový panel pro vývojáře a studenty -->
+            <aside class="dev-hint-panel" aria-live="polite">
+                <p>💡 <strong>Tip pro vývojáře:</strong> Odpověz dříve, než vyprší 10sekundový limit. Správná volba
+                    vyvolá zelený puls, špatná červený třes a po 1,5 sekundě automaticky nastoupí nová náhodná otázka.
+                </p>
+            </aside>
+
+        </section>
+    </main>
+
+    <!-- Patička stránky -->
+    <footer class="app-footer">
+        <p>QuizApp v2 &bull; Výukový playground od Vlka samotáře &bull; Licence GNU AGPL-3.0</p>
+    </footer>
+
+    <!-- Logika aplikace (pro studentskou verzi přepněte na src="script-students.js") -->
+    <script src="script.js"></script>
+    <!-- <script src="script-students.js"></script> -->
+</body>
+
+</html>
