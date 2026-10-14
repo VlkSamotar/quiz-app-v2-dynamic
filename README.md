@@ -103,7 +103,7 @@ quiz-app-v2-dynamic/
 ├── README.md             # Tento didaktický průvodce s architekturou a návodem
 └── docs/                 # Výukové podklady a taháky
     ├── quiz-app-v2-dynamic.md
-    └── JS_matematika_casovace_CSS_animace_tahak.md
+    └── JS-matematika-casovace-CSS-animace-tahak.md
 ```
 
 ---
