@@ -379,14 +379,6 @@ body {
 @keyframes correct-pulse {
 
     /* ZDE NAPIŠ KLÍČOVÉ SNÍMKY PRO TODO 4: */
-    0%,
-    100% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.03);
-    }
 }
 
 /* TODO 5: Vytvoř klíčové snímky pro animaci zatřesení při chybné odpovědi (@keyframes shake) */
@@ -399,20 +391,6 @@ body {
 @keyframes shake {
 
     /* ZDE NAPIŠ KLÍČOVÉ SNÍMKY PRO TODO 5: */
-    0%,
-    100% {
-        transform: translateX(0);
-    }
-
-    20%,
-    60% {
-        transform: translateX(-7px);
-    }
-
-    40%,
-    80% {
-        transform: translateX(7px);
-    }
 }
 
 /* Blikání ukazatele času při kritickém stavu (ponecháno funkční) */
